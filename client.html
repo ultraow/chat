@@ -1,0 +1,291 @@
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+<script src="socket.io/socket.io.js"></script>
+<script type="text/javascript">
+
+$(function() {
+    win = new chat(Math.floor(Math.random()*1000000+1), 'http://qlogo4.store.qq.com/qzone/404911123/404911123/50', '192.168.1.121:2012','192.168.1.1');
+});
+var chat = function(name, avatar, ip, myip) {
+    var socket = io.connect(ip);
+    var spantimer = new Array();
+    socket.on('message', function(msg) {
+        var t = new Date(msg.timer);
+        var span = $('<b />').text((t.getMonth() + 1) + '月' + t.getDate() + '日');
+        //alert(spantimer[msg.tid]);
+        if(spantimer[msg.tid]  != span.text()) {
+            $('ul.chatroom li#' + msg.tid + ' div.message ul.msg').append(span);
+            spantimer[msg.tid]  = span.text();
+        }
+        var li = $('<li />').addClass('own').html('<img src="' + msg.avatar + '" /><div class="tweet">' + msg.msg + '</div><span class="timer">' + t.getHours() + ':' + t.getMinutes() + '</span><br />').hover(
+                function() {
+                    $(this).find('span.timer').show();
+                },
+                function() {
+                    $(this).find('span.timer').hide();
+                }
+        );
+        $('ul.chatroom li#' + msg.tid + ' div.message ul.msg').append(li).animate({scrollTop:'+='+(li.height()+100)},200);
+    });
+
+    socket.on('messageTo', function(msg) {
+        var cunzai = false;
+        $('ul.chatroom li').each(
+                function() {
+                    if($(this).attr('id') == msg.socketid) cunzai = true;
+                }
+        );
+        if(!cunzai) {
+            addchat(msg.socketid, msg.lid, msg.avatar);
+        }
+        var t = new Date(msg.timer);
+        var span = $('<b />').text((t.getMonth() + 1) + '月' + t.getDate() + '日');
+        if(spantimer[msg.socketid]  != span.text()) {
+            $('ul.chatroom li#' + msg.socketid + ' div.message ul.msg').append(span);
+            spantimer[msg.socketid] = span.text();
+        }
+        var li = $('<li />').addClass('player').html('<img src="' + msg.avatar + '" /><div class="tweet">' + msg.msg + '</div><span class="timer">' + t.getHours() + ':' + t.getMinutes() + '</span><br />').hover(
+                function() {
+                    $(this).find('span.timer').show();
+                },
+                function() {
+                    $(this).find('span.timer').hide();
+                }
+        );
+        $('ul.chatroom li#' + msg.socketid + ' div.message ul.msg').append(li).animate({scrollTop:'+='+(li.height()+100)}, 200);
+    });
+
+    socket.on('change', function(socketid) {
+        $('ul.chatroom li#' + socketid).remove();
+        $('ul.list li#' + socketid).remove();
+    });
+
+    socket.on('loginIn', function(user) {
+        addplayer(user.id, user.name, user.avatar);
+    });
+
+    socket.on('getplayers', function(users) {
+        for(var i = 0; i < users.length; i++) {
+            addplayer(users[i].id, users[i].name, users[i].avatar);
+        }
+    });
+
+    this.name = name;
+    this.avatar = avatar;
+
+    socket.emit('login', {
+        name : this.name,
+        avatar : this.avatar
+    });
+
+
+    var win = $('<div />').addClass('chat').attr('id', 'chat');
+    var ctitle = $('<h1 />').addClass('title').text('即时聊天').click(function(e) {
+        var cm = $(this).parent();
+        if(cm.hasClass('on')) {
+            cm.removeClass('on');
+        }else{
+            cm.addClass('on');
+        }
+    }).hover(
+            function() {
+                $(this).addClass('hover');
+            },
+            function() {
+                $(this).removeClass('hover');
+            }
+    );
+    var cbody = $('<div />').addClass('mian');
+    var closing = $('<a />').addClass('close').text('×').click(function(e) {
+        $(this).parent().parent().removeClass('on').css('top', 'auto').css('left', 'auto');
+    });
+    var list = $('<ul />').addClass('list');
+    var chatroom = $('<ul />').addClass('chatroom').attr('valign','bottom');
+    var user = $('<div />').addClass('user').append('<h1>' + this.name + '</h1><img src="' + this.avatar + '" />');
+
+    function addplayer(socketid, player, avatar) {
+        var one = $('<li />').attr('id', socketid).hover(
+                function() {
+                    $(this).addClass('hover');
+                },
+                function() {
+                    $(this).removeClass('hover');
+                }
+        ).click(
+                function(e) {
+                    //$(this).parent().find('li').removeClass('on');
+                    //$(this).addClass('on');
+                    var cunzai = false;
+                    $('ul.chatroom li').each(
+                            function(e) {
+                                if($(this).attr('id') == socketid) cunzai = true;
+                            }
+                    );
+                    if(!cunzai) {
+                        addchat(socketid, player, avatar);
+                    }
+
+                }
+        );
+        var img = $('<img />').attr('src', avatar);
+        var name = $('<h2 />').text(player);
+//                message.append(input).append(to).append(by);
+        one.append(img).append(name).appendTo(list); //.append(message);
+    }
+
+    function addchat(id, player, avatar) {
+        var one = $('<li />').attr('id', id).hover(
+                function() {
+                    $(this).addClass('hover');
+                },
+                function() {
+                    $(this).removeClass('hover');
+                }
+        ).click(
+                function(e) {
+                    $(this).addClass('on');
+                }
+        );
+        var message = $('<div />').addClass('message').append('<ul class="msg"></ul> ');
+        var input = $('<input />').attr('name', 'msg').keypress(function(e) {
+            by.text($(this).val().length + '/140 「ENTER」 发送');
+            if($(this).val() != '') {
+                to.hide();
+            }else{
+                to.show();
+            }
+        }).keydown(function(e) {
+                    by.text($(this).val().length + '/140 「ENTER」 发送');
+                    if($(this).val() != '') {
+                        to.hide();
+                    }else{
+                        to.show();
+                    }
+                    if(e.keyCode == 13) {
+                        if($(this).val() != '') {
+                            socket.emit('msg', {
+                                tid   : id,
+                                msg  : $(this).val(),
+                                ip : myip,
+                                timer : 0
+                            });
+                            $(this).val('');
+                            to.show();
+                        }
+                        return false;
+                    }
+                }).keyup(function(e) {
+                    by.text($(this).val().length + '/140 「ENTER」 发送');
+                    if($(this).val() != '') {
+                        to.hide();
+                    }else{
+                        to.show();
+                    }
+                }).focus(function(e) {
+                    to.addClass('on');
+                }).blur(function(e) {
+                    to.removeClass('on');
+                });
+
+        var to = $('<span />').addClass('to').text('to ' + player).click(function(e) {
+            input.focus();
+        });
+        var by = $('<span />').addClass('by').text('0/140 「ENTER」 发送');
+
+        var img = $('<img />').attr('src', avatar);
+        var close = $('<a class="close" />').click(
+                function() {
+                    spantimer[$(this).parent().parent().attr('id')] = '';
+                    //alert($(this).parent().parent().attr('id'));
+                    $(this).parent().parent().remove();
+                }
+        );
+        var name = $('<h2 />').text(player).click(
+                function() {
+                    if(!$(this).parent().hasClass('hide')) {
+                        $(this).parent().addClass('hide').find('.message').hide();
+                    }else{
+                        $(this).parent().removeClass('hide').find('.message').show();
+                    }
+                }
+        ).hover(
+                function() {
+                    $(this).addClass('hover').find('a.close').show();
+                },
+                function() {
+                    if($(this).parent().hasClass('hide')) $(this).removeClass('hover').find('a.close').hide();
+                }
+        ).append(close);
+
+        message.append(input); //.append(to).append(by);
+        one.append(name).append(message).appendTo(chatroom); //.append(message);.append(img)
+    }
+
+    cbody.append(ctitle).append(list);//.append(user); //.append(closing)
+    win.append(cbody).append('<span class="author"><a href="http://www.own.cm">Own</a></span>').appendTo('body');
+    chatroom.appendTo('body');
+}
+</script>
+<style type="text/css">
+    #chat.chat{position: fixed; right: 30px; bottom: 0px; z-index: 1;}
+    #chat.chat h1.title{cursor: pointer; padding: 5px; margin: 0px; font-size: 12px; background: #EBEBEB; width: 196px;}
+    #chat.chat h1.title.hover{background: #EFEFEF;}
+    #chat.chat div.mian{border: 1px #CCC solid; border-bottom: none; padding: 1px; padding-bottom: 0px; right: 0px;}
+    #chat.chat div.mian ul.list{display: none;}
+    ul.chatroom{position: fixed; right: 260px; bottom: 0px; z-index: 1; padding: 0px; margin: 0px;}
+    #chat div.mian.on ul.list{display: block;}
+    #chat div.user{position: absolute; right: 100px; top: 0px; width: 100px; height: 40px;}
+    #chat div.user img{position: absolute; top: 0px; right: 0px; width: 40px; height: 40px; background: #CCC;}
+    #chat div.user h1{position: absolute; top: 3px; right: 43px; margin: 0px; font-size: 14px; text-align: right;}
+    #chat div.mian a.close{position: absolute; top: 0px; right: 0px; display: inline-block; width: 30px; height: 30px; text-align: center; line-height: 30px; cursor: pointer; color: #333; z-index: 2;}
+    #chat div.mian a.close:hover{background: #CCC; color: #FFF;}
+
+    #chat div.mian ul.list{width: 200px; padding: 3px; padding-bottom: 0px; height: 270px; list-style: none; margin: 0px; overflow-y: auto;}
+    #chat div.mian ul.list li{padding: 5px; cursor: pointer; height: 30px; cursor: auto; margin-bottom: 3px; cursor: pointer;}
+    #chat div.mian ul.list li.hover{background: #EBEBEB;}
+    #chat div.mian ul.list li.on{background: #4898F8;}
+
+    #chat div.mian ul.list li img{width: 30px; height: 30px; float: left;}
+    #chat div.mian ul.list li h2{width: 75px; font-size: 12px; float: left; padding: 0px; margin: 0px; padding-left: 5px; line-height: 30px;}
+    #chat div.mian ul.list li.on h2{color: #FFF;}
+
+    ul.chatroom{list-style: none;}
+    ul.chatroom li{float: right; margin-right: 10px; height: 25px; position: relative; width: 260px;}
+    ul.chatroom li h2{font-size: 12px; padding: 5px; padding-top: 0px; padding-bottom: 0px; line-height: 25px; margin: 0px; background: RGB(120, 159, 210); border: 1px #0064ea solid; border-bottom: none; color: #FFF; height: 25px; cursor: pointer; position: absolute; width: 248px; top: -307px;}
+    ul.chatroom li.hide{border: 1px RGB(180, 187, 202) solid; border-bottom: none; top: 0px; width: 170px; height: 24px;}
+    ul.chatroom li.hide h2{border: none; border-top: 1px solid RGB(245, 247, 250); background: RGB(235, 238, 244); color: #000; width: 160px; top: 0px; height: 25px; line-height: 25px;}
+    ul.chatroom li.hide h2.hover{background: RGB(245, 247, 250); border-color: RGB(250, 251, 253);}
+
+    ul.chatroom li h2 a.close{float: right; width: 21px; height: 25px; background: url("https://fbstatic-a.akamaihd.net/rsrc.php/v2/yG/x/4GxErz9TbmS.png") no-repeat -46px -344px;}
+    ul.chatroom li h2 a.close:hover{background: url("https://fbstatic-a.akamaihd.net/rsrc.php/v2/yG/x/4GxErz9TbmS.png") no-repeat -68px -344px;}
+    ul.chatroom li.hide h2 a.close{width: 15px; height: 15px; margin-top: 5px; display: inline-block; background: url("https://fbstatic-a.akamaihd.net/rsrc.php/v2/yG/x/4GxErz9TbmS.png") no-repeat -268px -30px;}
+    ul.chatroom li.hide h2 a.close:hover{background: url("https://fbstatic-a.akamaihd.net/rsrc.php/v2/yG/x/4GxErz9TbmS.png") no-repeat -268px -62px; color: #FFF;}
+
+    ul.chatroom li div.message{border: 1px #CCCCCC solid; border-top: none; position: absolute; top: -282px; background: #FFF;}
+    ul.chatroom li div.message ul.msg{width: 258px; height: 283px; overflow-y: auto; clear: both; padding: 0px; margin: 0px; overflow-x: none;}
+    ul.chatroom li div.message ul.msg li{border: none; border-top: 1px #CCC solid; position: relative; float: none; width: 100%;}
+    ul.chatroom li div.message ul.msg li br{clear: both;}
+
+    ul.chatroom li div.message ul.msg li img{width: 40px; height: 40px; float: left;}
+    ul.chatroom li div.message ul.msg li div.tweet{font-size: 12px; word-break: normal; word-wrap: break-word; padding-left: 45px;}
+    ul.chatroom li div.message ul.msg b{clear: both; display: block; font-size: 12px; padding: 3px;}
+    ul.chatroom li div.message ul.msg li span.timer{position: absolute; top: -7px; right: 0px; font-size: 12px; z-index: 99; padding-left: 2px; padding-right: 2px; background: #FFF; display: none;}
+    ul.chatroom li div.message ul.msg li{display: block; margin: 0px; padding: 3px; width: auto;}
+
+
+    div.message{overflow: auto;}
+    div.message input{width: 252px; outline: none; resize: none; padding: 3px; border: none; border-top: 1px #EBEBEB solid; margin: 0px;}
+        /*div.message input:focus{border-color: #4898F8; background: #E1EEFF;}*/
+    div.message span.to{position: absolute; bottom: 50px; left: 4px; font-size: 12px;}
+    div.message span.by{position: absolute; bottom: 50px; right: 0px; font-size: 12px; color: #333;}
+    div.message span.on{color: #CCC;}
+
+
+
+
+
+    #chat span.author{position: absolute; right: 5px; bottom: 2px; color: #CCC; font-size: 12px;}
+    #chat span.author a{color: #4898F8; text-decoration: none;}
+    #chat span.author a:hover{text-decoration: underline;}
+</style>
+
