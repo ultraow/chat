@@ -18,13 +18,13 @@ server = http.createServer(function(req, res){
     switch (path){
         case '/':
             res.writeHead(200, {'Content-Type': 'text/html'});
-            res.write('<h1>点这里>>><a href="/index.html">聊天</a><<<</h1>');
+            res.write('<h1>click >>><a href="/chat.html">to chat test</a><<<</h1>');
             res.end();
             break;
         case '/chat.html':
             fs.readFile(__dirname + path, function(err, data){
                 if (err) return send404(res);
-                res.writeHead(200, {'Content-Type': path == 'json.js' ? 'text/javascript' : 'text/html'})
+                res.writeHead(200, {'Content-Type': path == 'json.js' ? 'text/javascript' : 'text/html'});
                 res.write(data, 'utf8');
                 res.end();
             });
@@ -32,7 +32,7 @@ server = http.createServer(function(req, res){
         case '/chat.js':
             fs.readFile(__dirname + path, function(err, data){
                 if (err) return send404(res);
-                res.writeHead(200, {'Content-Type': path == 'json.js' ? 'text/javascript' : 'text/javascript'})
+                res.writeHead(200, {'Content-Type': path == 'json.js' ? 'text/javascript' : 'text/javascript'});
                 res.write(data, 'utf8');
                 res.end();
             });
