@@ -1,10 +1,11 @@
 /**
  * Created with JetBrains WebStorm.
- * User: Administrator
+ * User: ultra
  * Date: 13-9-10
  * Time: 下午8:40
  * To change this template use File | Settings | File Templates.
  */
+
 var http = require('http'),
     url = require('url'),
     fs = require('fs'),
@@ -12,47 +13,28 @@ var http = require('http'),
     server;
 
 server = http.createServer(function(req, res){
-    // your normal server code
     var path = url.parse(req.url).pathname;
     o.log(path);
-    switch (path){
-        case '/':
-            res.writeHead(200, {'Content-Type': 'text/html'});
-            res.write('<h1>click >>><a href="/chat.html">to chat test</a><<<</h1>');
-            res.end();
-            break;
-        case '/chat.html':
-            fs.readFile(__dirname + path, function(err, data){
-                if (err) return send404(res);
-                res.writeHead(200, {'Content-Type': path == 'json.js' ? 'text/javascript' : 'text/html'});
-                res.write(data, 'utf8');
-                res.end();
-            });
-            break;
-        case '/chat.js':
-            fs.readFile(__dirname + path, function(err, data){
-                if (err) return send404(res);
-                res.writeHead(200, {'Content-Type': path == 'json.js' ? 'text/javascript' : 'text/javascript'});
-                res.write(data, 'utf8');
-                res.end();
-            });
-            break;
-        default: send404(res);
-    }
+
+    fs.readFile(__dirname + path, function(err, data){
+        if (err) return send404(res);
+        res.writeHead(200, {'Content-Type': 'text/html, charset=UTF-8'});
+        res.write(data, 'utf8');
+        res.end();
+    });
 }),
 
-    send404 = function(res){
-        res.writeHead(404);
-        res.write('404');
-        res.end();
-    };
+send404 = function(res){
+    res.writeHead(404, {'Content-Type': 'text/html, charset=UTF-8'});
+    res.write('404 Not Found', 'utf8');
+    res.end();
+};
 
 server.listen(80);
 
 var players = new Array();
 var s = new Array();
 var list = new Array();
-var persons = 0;
 
 var io = require('socket.io').listen(server);
 io.sockets.on('connection', function(socket){
@@ -71,14 +53,11 @@ io.sockets.on('connection', function(socket){
             d.socketid = socket.id;
             d.avatar = players[socket.id].avatar;
             s[data.tid].emit('messageTo', d);
-        }catch(e){}
+        }catch(e){o.log(e.stack);}
     });
     socket.on('login',function(user) {
         try
         {
-            //persons++;
-
-            //o.log(persons);
             o.log('正在发送用户列表给新用户...');
             socket.emit('getplayers', list);
             o.log('用户列表发送完成!');
@@ -89,14 +68,11 @@ io.sockets.on('connection', function(socket){
             list.push(user);
             socket.broadcast.emit('loginIn', user);
             o.log('用户 ' + user.name + ' 登录了！当前在线人数：' + String(list.length));
-        }catch(e){}
+        }catch(e){o.log(e.stack);}
     });
     socket.on('disconnect', function(){
         try
         {
-            //persons--;
-
-            //o.log(persons);
             players.splice(socket.id, 1);
             s.splice(socket.id, 1);
             for(var i=0; i < list.length; i++) {
@@ -106,6 +82,7 @@ io.sockets.on('connection', function(socket){
             }
             socket.broadcast.emit('change', socket.id);
             o.log('用户 ' + players[socket.id].name + ' 退出了! 当前在线人数：' + String(list.length));
-        }catch(e){}
+        }catch(e){o.log(e.stack);}
     });
 });
+o.log('服务器已经启动，开始监听80端口!');
