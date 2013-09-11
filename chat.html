@@ -72,12 +72,12 @@
 <body>
 <script>
 
-var name = '123';
+var name = 'ireoo' + Math.floor(Math.random()*1000000+1);
 var avatar = 'http://www.ireoo.com/u/s1.jpg';
-var ip = '123';
+var ip = 'localhost';
 var myip = '123';
 
-var socket = io.connect('192.168.1.100');
+var socket = io.connect(ip);
 var spantimer = new Array();
 socket.on('message', function(msg) {
     var t = new Date(msg.timer);
