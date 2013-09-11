@@ -1,29 +1,61 @@
-var http    = require('http'),
-    io      = require('socket.io'),
-    fs      = require('fs'),
-    o       = require('util');
-o.log('服务器启动中...');
-var config = {
-    port : 2012
-}
-//http = http.createServer(handler);
-//http.listen(config.port);
-io = io.listen(config.port);
+/**
+ * Created with JetBrains WebStorm.
+ * User: Administrator
+ * Date: 13-9-10
+ * Time: 下午8:40
+ * To change this template use File | Settings | File Templates.
+ */
+var http = require('http'),
+    url = require('url'),
+    fs = require('fs'),
+    o  = require('util'),
+    server;
 
-//function handler(req, res) {
-//    fs.readFile(__dirname+'/client.js',
-//        function(err, data){
-//            req.setEncoding(encoding="utf8");
-//            res.writeHead(200);
-//            res.end(data);
-//        });
-//}
+server = http.createServer(function(req, res){
+    // your normal server code
+    var path = url.parse(req.url).pathname;
+    o.log(path);
+    switch (path){
+        case '/':
+            res.writeHead(200, {'Content-Type': 'text/html'});
+            res.write('<h1>点这里>>><a href="/index.html">聊天</a><<<</h1>');
+            res.end();
+            break;
+        case '/chat.html':
+            fs.readFile(__dirname + path, function(err, data){
+                if (err) return send404(res);
+                res.writeHead(200, {'Content-Type': path == 'json.js' ? 'text/javascript' : 'text/html'})
+                res.write(data, 'utf8');
+                res.end();
+            });
+            break;
+        case '/chat.js':
+            fs.readFile(__dirname + path, function(err, data){
+                if (err) return send404(res);
+                res.writeHead(200, {'Content-Type': path == 'json.js' ? 'text/javascript' : 'text/javascript'})
+                res.write(data, 'utf8');
+                res.end();
+            });
+            break;
+        default: send404(res);
+    }
+}),
+
+    send404 = function(res){
+        res.writeHead(404);
+        res.write('404');
+        res.end();
+    };
+
+server.listen(80);
+
 var players = new Array();
 var s = new Array();
 var list = new Array();
 var persons = 0;
 
-io.sockets.on('connection',function(socket){
+var io = require('socket.io').listen(server);
+io.sockets.on('connection', function(socket){
     socket.on('msg',function(data){
         try
         {
@@ -77,4 +109,3 @@ io.sockets.on('connection',function(socket){
         }catch(e){}
     });
 });
-o.log('服务器已经启动!');
