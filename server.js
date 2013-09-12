@@ -18,11 +18,11 @@ server = http.createServer(function(req, res){
 
     fs.readFile(__dirname + path, function(err, data){
         if (err) return send404(res);
-        res.writeHead(200, {'Content-Type': 'text/html, charset=UTF-8'});
+        res.writeHead(200, {'Content-Type': path.substr(path.length-2) == 'js' ? 'text/javascript, charset=UTF-8' : 'text/html, charset=UTF-8'});
         res.write(data, 'utf8');
         res.end();
     });
-}),
+});
 
 send404 = function(res){
     res.writeHead(404, {'Content-Type': 'text/html, charset=UTF-8'});
