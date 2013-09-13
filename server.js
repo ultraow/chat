@@ -13,9 +13,9 @@ var http = require('http'),
     server;
 
 server = http.createServer(function(req, res){
+    req.setEncoding(encoding="utf8");
     var path = url.parse(req.url).pathname;
-    o.log(path);
-
+    o.log(path);   //显示用户打开扫描页面
     fs.readFile(__dirname + path, function(err, data){
         if (err) return send404(res);
         res.writeHead(200, {'Content-Type': path.substr(path.length-2) == 'js' ? 'text/javascript, charset=UTF-8' : 'text/html, charset=UTF-8'});
@@ -25,8 +25,8 @@ server = http.createServer(function(req, res){
 });
 
 send404 = function(res){
-    res.writeHead(404, {'Content-Type': 'text/html, charset=UTF-8'});
-    res.write('404 Not Found', 'utf8');
+    res.writeHead(404);
+    res.write('404 Not Found');
     res.end();
 };
 

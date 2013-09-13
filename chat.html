@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>ireoo nodejs即时聊天技术</title>
     <script src="/socket.io/socket.io.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
     <style type="text/css">
         #chat.chat{position: fixed; right: 30px; bottom: 0px; z-index: 1;}
         #chat.chat h1.title{cursor: pointer; padding: 5px; margin: 0px; font-size: 12px; background: #EBEBEB; width: 196px;}
@@ -67,10 +67,14 @@
 <body>
 <script>
 
-var win = new chat('ireoo' + Math.floor(Math.random()*1000000+1), 'http://www.ireoo.com/u/s1.jpg', 'localhost', '123');
+//var win = new chat('ireoo' + Math.floor(Math.random()*1000000+1), 'http://www.ireoo.com/u/s1.jpg', 'localhost', '123');
 
-var chat = function(name, avatar, ip, myip) {
-    var socket = io.connect(ip);
+var name = 'ireoo' + Math.floor(Math.random()*1000000+1);
+var avatar = 'http://www.ireoo.com/u/s1.jpg';
+var myip = 'www.ireoo.com';
+
+//var chat = function(name, avatar, ip, myip) {
+    var socket = io.connect(null);
     var spantimer = new Array();
     socket.on('message', function(msg) {
         var t = new Date(msg.timer);
@@ -287,8 +291,7 @@ var chat = function(name, avatar, ip, myip) {
     cbody.append(ctitle).append(list);//.append(user); //.append(closing)
     win.append(cbody).append('<span class="author"><a href="http://www.ireoo.com">Ireoo</a></span>').appendTo('body');
     chatroom.appendTo('body');
-    return chatroom;
-}
+//}
 </script>
 
 </body>
