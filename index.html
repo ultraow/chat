@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>ireoo nodejs即时聊天技术</title>
+    <title>淮安娱乐 － 聊天室</title>
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
     <script type="text/javascript">
@@ -54,8 +54,8 @@
              *
              */
 
-            var chatbox = $('<div />').css({borderRadius: '5px', boxShadow: '0 0 5px #333', position: 'fixed', bottom: '20px', left: '20px', overflow: 'hidden', outline: 'none'}).width($(window).width() - 40).height(50).appendTo('body');
-            var chatinput = $('<input />').css({border: 'none'}).width(chatbox.width()).height(chatbox.height()).appendTo(chatbox).focus(function() {
+            var chatbox = $('<div />').css({borderRadius: '5px', boxShadow: '0 0 5px #333', position: 'fixed', bottom: '20px', left: '20px', overflow: 'hidden'}).width($(window).width() - 40).height(50).appendTo('body');
+            var chatinput = $('<input />').css({border: 'none', padding: '10px', fontSize: '20px', outline: 'none'}).width(chatbox.width() - 20).height(chatbox.height() - 20).appendTo(chatbox).focus(function() {
                 chatbox.css({boxShadow: '0 0 5px #4898F8'});
             }).blur(function() {
                 chatbox.css({boxShadow: '0 0 5px #333'});
