@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5139d47c-8776-4a63-8349-f86220bb6a1e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.html" afterPath="$PROJECT_DIR$/index.html" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mini.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="chat.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -25,10 +26,19 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="index.html" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="235" column="0" selection-start="8805" selection-end="8805" vertical-scroll-proportion="0.67450273" vertical-offset="3347" max-vertical-offset="3900">
+            <state line="210" column="8" selection-start="8060" selection-end="8791" vertical-scroll-proportion="5.625" vertical-offset="3285" max-vertical-offset="3900">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="mini.html" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/mini.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="103" column="0" selection-start="4128" selection-end="4128" vertical-scroll-proportion="0.43037975" vertical-offset="1367" max-vertical-offset="2790">
               <folding />
             </state>
           </provider>
@@ -73,6 +83,7 @@
         <option value="$PROJECT_DIR$/chat.html" />
         <option value="$PROJECT_DIR$/server.js" />
         <option value="$PROJECT_DIR$/index.html" />
+        <option value="$PROJECT_DIR$/mini.html" />
       </list>
     </option>
   </component>
@@ -252,7 +263,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="235" column="0" selection-start="8805" selection-end="8805" vertical-scroll-proportion="0.67450273" vertical-offset="3347" max-vertical-offset="3900">
+        <state line="210" column="8" selection-start="8060" selection-end="8791" vertical-scroll-proportion="5.625" vertical-offset="3285" max-vertical-offset="3900">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mini.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="103" column="0" selection-start="4128" selection-end="4128" vertical-scroll-proportion="0.43037975" vertical-offset="1367" max-vertical-offset="2790">
           <folding />
         </state>
       </provider>
