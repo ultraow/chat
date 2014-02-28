@@ -63,8 +63,17 @@ io.sockets.on('connection', function(socket){
         {
             o.log(players[socket.id].name + ' say: ' + data.msg);
             data.timer = (new Date()).getTime();
-            socket.emit('chatall', data);
+            //socket.emit('chatall', data);
             socket.broadcast.emit('chatall', data);
+        }catch(e){o.log(e.stack);}
+    });
+    socket.on('system', function(data){
+        try
+        {
+            o.log('[system]: ' + data.msg);
+            data.timer = (new Date()).getTime();
+            //socket.emit('chatall', data);
+            socket.broadcast.emit('system', data);
         }catch(e){o.log(e.stack);}
     });
     socket.on('login',function(user) {
@@ -78,7 +87,7 @@ io.sockets.on('connection', function(socket){
             socket.emit('login', socket.id);
             user.id = socket.id;
             list.push(user);
-            socket.emit('loginIn', user);
+            //socket.emit('loginIn', user);
             socket.broadcast.emit('loginIn', user);
             o.log('用户 ' + user.name + ' 登录了！当前在线人数：' + String(list.length));
         }catch(e){o.log(e.stack);}

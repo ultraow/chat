@@ -20,26 +20,37 @@
 
             socket.on('chatall', function(msg) {
 
-                chatcom(msg.id, msg.avatar, msg.msg, msg.timer);
+                chatcom(msg.id, msg.avatar, msg.msg, msg.timer, false);
 
             });
             socket.on('change', function(socketid) {
 
                 $('ul.chatroom li#' + socketid).remove();
+                systemmsg('用户 ' + user.name + '进入聊天室.');
 
             });
             socket.on('loginIn', function(user) {
 
                 addplayer(user.id, user.name, user.avatar);
+                systemmsg('用户 ' + user.name + '进入聊天室.');
 
             });
             socket.on('getplayers', function(users) {
 
+                systemmsg('获取用户列表...');
                 for(var i = 0; i < users.length; i++) {
                     addplayer(users[i].id, users[i].name, users[i].avatar);
                 }
+                addplayer('', name + '(自己)', avatar);
+                systemmsg('获取用户列表完成.');
 
             });
+            socket.on('system', function(data) {
+
+                systemmsg(data.msg);
+
+            });
+
 
             /**
              * 登录服务器命令
@@ -67,14 +78,17 @@
                         if(e.keyCode == 13) {
 
                             if(chatinput.val() != '') {
-                                socket.emit('chatall', {
-                                    id    : name,
-                                    msg   : chatinput.val(),
-                                    ip    : myip,
-                                    timer : 0
+
+                                socket.emit('system', {
+                                    //id    : name,
+                                    msg   : chatinput.val()
+                                    //ip    : myip,
+                                    //timer : 0
                                 });
+                                chatcom(name, avatar, chatinput.val(), (new Date()).getTime(), true);
                                 chatinput.val('');
                             }
+
                             return false;
                         }
                     });
@@ -85,11 +99,12 @@
              * @type {appendTo|*|jQuery}
              */
 
-            var listbox = $('<ul />').css({borderRadius: '5px', boxShadow: '0 0 5px #333', position: 'fixed', top: '0', right: '20px', overflow: 'hidden', padding: '0'}).width(200).height($(window).height() - 110).addClass('chatroom').appendTo('body');
+            var listbox = $('<ul />').css({borderRadius: '5px', boxShadow: '0 0 5px #333', position: 'fixed', top: '20px', right: '20px', overflow: 'hidden', padding: '0', margin: '0'}).width(200).height($(window).height() - 110).addClass('chatroom').appendTo('body');
 
             var css = {listStyle: 'none', padding:'5px', margin: '5px'};
 
             var addplayer = function(socketid, player, avatar) {
+                if(player == name) player += '(自己)';
                 var one = $('<li />').css(css).attr('id', socketid).hover(
                         function() {
                             $(this).addClass('hover');
@@ -123,17 +138,34 @@
              *
              */
 
-            var chatroom = $('<ul />').css({padding: '0', margin: '0', listStyle: 'none', position: 'fixed', top: '20px', left: '20px', overflow: 'auto'}).width($(window).width() - 260).height($(window).height() - 110).appendTo('body');
+            var chatroom = $('<ul />').css({borderRadius: '5px', boxShadow: '0 0 5px #333', padding: '10px', margin: '0', listStyle: 'none', position: 'fixed', top: '20px', left: '20px', overflow: 'auto'}).width($(window).width() - 280).height($(window).height() - 130).appendTo('body');
 
             var chatheight = 0;
 
-            var chatcom = function(name, avatar, msg, timer) {
-                var image = $('<img />').attr('src', avatar).width(50).height(50).css({borderRadius: '5px', verticalAlign: 'bottom'});
+            var chatcom = function(name, avatar, msg, timer, ziji) {
+                var image = $('<img />').attr('src', avatar).attr('title', name).width(50).height(50).css({borderRadius: '5px', verticalAlign: 'bottom'});
                 var com = $('<div />').css({background: '#EBEBEB', borderRadius: '5px', padding: '5px', verticalAlign: 'bottom', display: 'inline-block', marginLeft: '10px', wordBreak: 'break-all', wordWrap: 'break-word', maxWidth: (chatroom.width() - 400) + 'px'}).text(msg);
-                var li = $('<li />').css({marginBottom: '10px'}).append(image).append(com).appendTo(chatroom);
+                if(!ziji) {
+                    var li = $('<li />').css({marginBottom: '10px'}).append(image).append(com).appendTo(chatroom);
+                    //alert('ziji');
+                }else{
+                    com.css({background: '#4898F8', marginLeft: '0', marginRight: '10px'});
+                    var li = $('<li />').css({marginBottom: '10px', textAlign: 'right'}).append(com).append(image).appendTo(chatroom);
+                }
+
                 chatheight += li.height() + 10;
                 chatroom.animate({scrollTop: chatheight}, 300);
             };
+
+            var systemmsg = function(msg) {
+                var com = $('<div />').css({background: 'red', borderRadius: '5px', padding: '5px', display: 'inline-block', wordBreak: 'break-all', wordWrap: 'break-word', fontSize: '12px', color: '#FFF'}).text('[系统] ' + msg);
+
+                    var li = $('<li />').css({marginBottom: '10px'}).append(com).appendTo(chatroom);
+
+                chatheight += li.height() + 10;
+                chatroom.animate({scrollTop: chatheight}, 300);
+            };
+
         });
     </script>
 </head>
