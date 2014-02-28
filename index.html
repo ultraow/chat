@@ -18,24 +18,26 @@
             var spantimer = [];
 
 
-            socket.on('message', function(msg) {
+            socket.on('chatall', function(msg) {
 
-
-
-            });
-            socket.on('change', function(msg) {
-
-
+                chatcom(msg.id, msg.avatar, msg.msg, msg.timer);
 
             });
-            socket.on('loginIn', function(msg) {
+            socket.on('change', function(socketid) {
 
-
+                $('ul.chatroom li#' + socketid).remove();
 
             });
-            socket.on('getplayers', function(msg) {
+            socket.on('loginIn', function(user) {
 
+                addplayer(user.id, user.name, user.avatar);
 
+            });
+            socket.on('getplayers', function(users) {
+
+                for(var i = 0; i < users.length; i++) {
+                    addplayer(users[i].id, users[i].name, users[i].avatar);
+                }
 
             });
 
@@ -60,7 +62,78 @@
             }).blur(function() {
                 chatbox.css({boxShadow: '0 0 5px #333'});
             });
+            chatinput.keypress(function(e) {
+                        //alert(chatinput.val());
+                        if(e.keyCode == 13) {
 
+                            if(chatinput.val() != '') {
+                                socket.emit('chatall', {
+                                    id    : name,
+                                    msg   : chatinput.val(),
+                                    ip    : myip,
+                                    timer : 0
+                                });
+                                chatinput.val('');
+                            }
+                            return false;
+                        }
+                    });
+
+            /**
+             *
+             * 创建列表框
+             * @type {appendTo|*|jQuery}
+             */
+
+            var listbox = $('<ul />').css({borderRadius: '5px', boxShadow: '0 0 5px #333', position: 'fixed', top: '0', right: '20px', overflow: 'hidden', padding: '0'}).width(200).height($(window).height() - 110).addClass('chatroom').appendTo('body');
+
+            var css = {listStyle: 'none', padding:'5px', margin: '5px'};
+
+            var addplayer = function(socketid, player, avatar) {
+                var one = $('<li />').css(css).attr('id', socketid).hover(
+                        function() {
+                            $(this).addClass('hover');
+                        },
+                        function() {
+                            $(this).removeClass('hover');
+                        }
+                ).click(
+                        function(e) {
+//                            var cunzai = false;
+//                            $('ul.chatroom li').each(
+//                                    function(e) {
+//                                        if($(this).attr('id') == socketid) cunzai = true;
+//                                    }
+//                            );
+//                            if(!cunzai) {
+//                                addchat(socketid, player, avatar);
+//                            }
+                        }
+                );
+                var img = $('<img />').attr('src', avatar).css({float: 'left'}).width(40).height(40);
+                var name = $('<h2 />').text(player).css({margin: '0', padding: '0 0 0 50px', fontSize: '16px', fontWeight: 'bold'}).height(40);
+//                message.append(input).append(to).append(by);
+                one.append(img).append(name).appendTo(listbox); //.append(message);
+
+            };
+
+            /**
+             *
+             * 创建聊天框
+             *
+             */
+
+            var chatroom = $('<ul />').css({padding: '0', margin: '0', listStyle: 'none', position: 'fixed', top: '20px', left: '20px', overflow: 'auto'}).width($(window).width() - 260).height($(window).height() - 110).appendTo('body');
+
+            var chatheight = 0;
+
+            var chatcom = function(name, avatar, msg, timer) {
+                var image = $('<img />').attr('src', avatar).width(50).height(50).css({borderRadius: '5px', verticalAlign: 'bottom'});
+                var com = $('<div />').css({background: '#EBEBEB', borderRadius: '5px', padding: '5px', verticalAlign: 'bottom', display: 'inline-block', marginLeft: '10px', wordBreak: 'break-all', wordWrap: 'break-word', maxWidth: (chatroom.width() - 400) + 'px'}).text(msg);
+                var li = $('<li />').css({marginBottom: '10px'}).append(image).append(com).appendTo(chatroom);
+                chatheight += li.height() + 10;
+                chatroom.animate({scrollTop: chatheight}, 300);
+            };
         });
     </script>
 </head>

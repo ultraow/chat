@@ -58,6 +58,15 @@ io.sockets.on('connection', function(socket){
             s[data.tid].emit('messageTo', d);
         }catch(e){o.log(e.stack);}
     });
+    socket.on('chatall',function(data){
+        try
+        {
+            o.log(players[socket.id].name + ' say: ' + data.msg);
+            data.timer = (new Date()).getTime();
+            socket.emit('chatall', data);
+            socket.broadcast.emit('chatall', data);
+        }catch(e){o.log(e.stack);}
+    });
     socket.on('login',function(user) {
         try
         {
@@ -69,6 +78,7 @@ io.sockets.on('connection', function(socket){
             socket.emit('login', socket.id);
             user.id = socket.id;
             list.push(user);
+            socket.emit('loginIn', user);
             socket.broadcast.emit('loginIn', user);
             o.log('用户 ' + user.name + ' 登录了！当前在线人数：' + String(list.length));
         }catch(e){o.log(e.stack);}
