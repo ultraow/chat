@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="5139d47c-8776-4a63-8349-f86220bb6a1e" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.html" afterPath="$PROJECT_DIR$/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server.js" afterPath="$PROJECT_DIR$/server.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="chat.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -30,7 +28,7 @@
       <file leaf-file-name="index.html" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="81" column="44" selection-start="2640" selection-end="2640" vertical-scroll-proportion="0.67811936" vertical-offset="870" max-vertical-offset="3960">
+            <state line="235" column="0" selection-start="8805" selection-end="8805" vertical-scroll-proportion="0.67450273" vertical-offset="3347" max-vertical-offset="3900">
               <folding />
             </state>
           </provider>
@@ -254,7 +252,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="81" column="44" selection-start="2640" selection-end="2640" vertical-scroll-proportion="0.67811936" vertical-offset="870" max-vertical-offset="3960">
+        <state line="235" column="0" selection-start="8805" selection-end="8805" vertical-scroll-proportion="0.67450273" vertical-offset="3347" max-vertical-offset="3900">
           <folding />
         </state>
       </provider>
