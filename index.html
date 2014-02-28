@@ -1,240 +1,190 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>淮安娱乐 － 聊天室</title>
-<script src="/socket.io/socket.io.js"></script>
-<script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
-<script type="text/javascript">
-$(function() {
-    var name = 'ireoo' + Math.floor(Math.random()*1000000+1);
-    var avatar = 'http://www.ireoo.com/u/s1.jpg';
-    var myip = 'www.ireoo.com';
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>淮安娱乐 － 聊天室</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
 
+            $('body').css({padding: '0', margin: '0'});
+            var avatar = '';
 
-    /**
-     *
-     * 登录框
-     *
-     */
+            /**
+             * 登录
+             */
+            $('<h1 />').text('欢迎来到淮安娱乐万人聊天室，你可以通过这里可以电脑在线的用户进行即时交流。目前为测试版本！').appendTo('body');
 
-    var denglu = $('<div />').width(200).height(100).css({padding: '10px', textAlign: 'center'}).text('昵称：');
-    denglu.css({background: '#FFF', boxShadow: '0 0 5px #333', position: 'fixed', top: ($(window).height() - denglu.height())/2 + 'px', left: ($(window).width() - denglu.width())/2 + 'px'}).appendTo('body');
-    var dengluinputname = $('<input />').width(80).attr('type', 'text').css({padding: '5px'});
-    var dengluinputimg = $('<input />').attr('type', 'hidden');
-    var button = $('<button />').text('登录').click(function() {
-        name = dengluinputname.val();
-        avatar = dengluinputimg.val();
-        jinri();
-        denglu.remove();
-    });
-
-    var boy = $('<img />').attr('src', '/image/boy.jpg').width(40).height(40).css({border: '5px #FFF solid'}).click(
-            function() {
-                $(this).css({border: '5px #4898F8 solid'});
-                girl.css({border: '5px #FFF solid'});
-                dengluinputimg.val($(this).attr('src'));
-            }
-    );
-    var girl = $('<img />').attr('src', '/image/girl.jpg').width(40).height(40).css({border: '5px #FFF solid'}).click(
-            function() {
-                $(this).css({border: '5px #4898F8 solid'});
-                boy.css({border: '5px #FFF solid'});
-                dengluinputimg.val($(this).attr('src'));
-            }
-    );
-
-    denglu.append(dengluinputname).append(dengluinputimg).append('<br />性别：').append(boy).append(girl).append('<br />').append(button);
-
-
-
-
-
-
-    function jinri() {
-
-        /**
-         * 连接服务器
-         */
-        var socket = io.connect(null);
-        var spantimer = [];
-
-
-        socket.on('chatall', function(msg) {
-
-            chatcom(msg.id, msg.avatar, msg.msg, msg.timer, false);
-
-        });
-        socket.on('change', function(socketid) {
-
-            $('ul.chatroom li#' + socketid.id).remove();
-            systemmsg('用户 ' + socketid.name + ' 离开聊天室.');
-
-        });
-        socket.on('loginIn', function(user) {
-
-            addplayer(user.id, user.name, user.avatar);
-            systemmsg('用户 ' + user.name + ' 进入聊天室.');
-
-        });
-        socket.on('getplayers', function(users) {
-
-            systemmsg('获取用户列表...');
-            for(var i = 0; i < users.length; i++) {
-                addplayer(users[i].id, users[i].name, users[i].avatar);
-            }
-            addplayer('', name + '(自己)', avatar);
-            systemmsg('获取用户列表完成.');
-
-        });
-        socket.on('system', function(data) {
-
-            systemmsg(data.msg);
-
-        });
-
-        /**
-         * 登录服务器命令
-         */
-        socket.emit('login', {
-            name : name,
-            avatar : avatar
-        });
-
-
-        /**
-         *
-         * 创建聊天框
-         *
-         */
-
-        var chatbox = $('<div />').css({borderRadius: '5px', boxShadow: '0 0 5px #333', position: 'fixed', bottom: '20px', left: '20px', overflow: 'hidden'}).width($(window).width() - 40).height(50).appendTo('body');
-        var chatinput = $('<input />').css({border: 'none', padding: '10px', fontSize: '20px', outline: 'none'}).width(chatbox.width() - 20).height(chatbox.height() - 20).appendTo(chatbox).focus(function() {
-            chatbox.css({boxShadow: '0 0 5px #4898F8'});
-        }).blur(function() {
-                    chatbox.css({boxShadow: '0 0 5px #333'});
-                });
-        chatinput.keypress(function(e) {
-            //alert(chatinput.val());
-            if(e.keyCode == 13) {
-
-                if(chatinput.val() != '') {
-
-                    socket.emit('chatall', {
-                        id    : name,
-                        msg   : chatinput.val(),
-                        ip    : myip,
-                        timer : 0
-                    });
-                    chatcom(name, avatar, chatinput.val(), (new Date()).getTime(), true);
-                    chatinput.val('');
-                }
-
-                return false;
-            }
-        });
-
-        /**
-         *
-         * 创建列表框
-         * @type {appendTo|*|jQuery}
-         */
-
-        var listbox = $('<ul />').css({borderRadius: '5px', boxShadow: '0 0 5px #333', position: 'fixed', top: '20px', right: '20px', overflow: 'auto', padding: '0', margin: '0'}).width(200).height($(window).height() - 110).addClass('chatroom').appendTo('body');
-
-        var css = {listStyle: 'none', padding:'5px', margin: '5px'};
-
-        var addplayer = function(socketid, player, avatar) {
-            if(player == name) player += '(自己)';
-            var one = $('<li />').css(css).attr('id', socketid).hover(
+            $('<label />').text('昵称').css({display: 'block'}).appendTo('body');
+            var name = $('<input />').attr('type', 'text').css({display: 'block', width: '90%', fontSize: '1em'}).appendTo('body');
+            $('<label />').text('性别').css({display: 'block'}).appendTo('body');
+            var boy = $('<button />').width(50).height(50).css({padding: '0', border: '5px #FFF solid', outline: 'none'}).append('<img style="width: 50px; height: 50px;" src="/image/boy.jpg" />').appendTo('body').click(
                     function() {
-                        $(this).addClass('hover');
-                    },
-                    function() {
-                        $(this).removeClass('hover');
-                    }
-            ).click(
-                    function(e) {
-//                            var cunzai = false;
-//                            $('ul.chatroom li').each(
-//                                    function(e) {
-//                                        if($(this).attr('id') == socketid) cunzai = true;
-//                                    }
-//                            );
-//                            if(!cunzai) {
-//                                addchat(socketid, player, avatar);
-//                            }
+                        $(this).css({borderColor: '#4898F8'});
+                        girl.css({borderColor: '#FFF'});
+                        avatar = '/image/boy.jpg';
                     }
             );
-            var img = $('<img />').attr('src', avatar).css({float: 'left'}).width(40).height(40);
-            var name = $('<h2 />').text(player).css({margin: '0', padding: '0 0 0 50px', fontSize: '16px', fontWeight: 'bold'}).height(40);
-//                message.append(input).append(to).append(by);
-            one.append(img).append(name).appendTo(listbox); //.append(message);
+            var girl = $('<button />').width(50).height(50).css({padding: '0', border: '5px #FFF solid', outline: 'none'}).append('<img style="width: 50px; height: 50px;" src="/image/girl.jpg" />').appendTo('body').click(
+                    function() {
+                        $(this).css({borderColor: '#4898F8'});
+                        boy.css({borderColor: '#FFF'});
+                        avatar = '/image/girl.jpg';
+                    }
+            );
+            $('<button />').text('登录').css({fontSize: '1em', width: '100%', height: '30px', marginTop: '30px'}).appendTo('body').click(
+                    function() {
+                        $('body').find('*').remove();
+                        //alert(name);
+                        //alert(avatar);
+                        go(name.val(), avatar);
+                    }
+            );
 
-        };
 
-        /**
-         *
-         * 创建聊天框
-         *
-         */
-
-        var chatroom = $('<ul />').css({borderRadius: '5px', boxShadow: '0 0 5px #333', padding: '10px', margin: '0', listStyle: 'none', position: 'fixed', top: '20px', left: '20px', overflow: 'auto'}).width($(window).width() - 280).height($(window).height() - 130).appendTo('body');
-
-        var chatheight = 0;
-
-        var chatcom = function(name, avatar, msg, timer, ziji) {
-            var image = $('<img />').attr('src', avatar).attr('title', name).width(50).height(50).css({borderRadius: '5px', verticalAlign: 'bottom'});
-            var com = $('<div />').css({background: '#EBEBEB', borderRadius: '10px', padding: '5px', verticalAlign: 'bottom', display: 'inline-block', marginLeft: '10px', wordBreak: 'break-all', wordWrap: 'break-word', maxWidth: (chatroom.width() - 400) + 'px'}).text(msg);
-            if(!ziji) {
-                var li = $('<li />').css({marginBottom: '10px'}).append(image).append(com).appendTo(chatroom);
-                //alert('ziji');
-            }else{
-                com.css({background: '#4898F8', marginLeft: '0', marginRight: '10px', textAlign: 'left'});
-                var li = $('<li />').css({marginBottom: '10px', textAlign: 'right'}).append(com).append(image).appendTo(chatroom);
-            }
-
-            chatheight += li.height() + 10;
-            chatroom.animate({scrollTop: chatheight}, 300);
-        };
-
-        var systemmsg = function(msg) {
-            var com = $('<div />').css({display: 'inline-block', fontSize: '12px', color: '#CCC', margin: 'auto'}).text('[系统] ' + msg);
-
-            var li = $('<li />').css({marginBottom: '10px'}).append(com).appendTo(chatroom);
-
-            chatheight += li.height() + 10;
-            chatroom.animate({scrollTop: chatheight}, 300);
-        };
-
-        /**
-         *
-         * 系统尺寸改变
-         *
-         */
-
-        $(window).resize(function() {
-            if($(window).width() >= 1000) {
-                chatroom.width($(window).width() - 280).height($(window).height() - 130);
-                listbox.width(200).height($(window).height() - 110).show();
-                chatroom.animate({scrollTop: chatheight}, 300);
-                chatbox.width($(window).width() - 40).height(50);
-            }else{
-                listbox.hide();
-                chatroom.width($(window).width() - 60).height($(window).height() - 130);
-
-                chatroom.animate({scrollTop: chatheight}, 300);
-                chatbox.width($(window).width() - 40).height(50);
-            }
         });
 
-    }
+        function go(n, a) {
+            var myip = '';
+            /**
+             * 连接服务器
+             */
+            var socket = io.connect(null);
+            var spantimer = [];
 
-});
+
+            socket.on('chatall', function(msg) {
+
+                chatcom(msg.id, msg.avatar, msg.msg, msg.timer, false);
+
+            });
+            socket.on('change', function(socketid) {
+
+                //$('ul.chatroom li#' + socketid.id).remove();
+                systemmsg('用户 ' + socketid.name + ' 离开聊天室.');
+
+            });
+            socket.on('loginIn', function(user) {
+
+                //addplayer(user.id, user.name, user.avatar);
+                systemmsg('用户 ' + user.name + ' 进入聊天室.');
+
+            });
+//                socket.on('getplayers', function(users) {
+//
+//                    systemmsg('获取用户列表...');
+//                    for(var i = 0; i < users.length; i++) {
+//                        addplayer(users[i].id, users[i].name, users[i].avatar);
+//                    }
+//                    addplayer('', name + '(自己)', avatar);
+//                    systemmsg('获取用户列表完成.');
+//
+//                });
+            socket.on('system', function(data) {
+
+                systemmsg(data.msg);
+
+            });
+
+            /**
+             * 登录服务器命令
+             */
+            socket.emit('login', {
+                name : n,
+                avatar : a
+            });
+
+            /**
+             *
+             * 创建聊天框
+             *
+             */
+            var chatroom = $('<ul />').css({padding: '10px', margin: '0', listStyle: 'none', overflow: 'auto'}).width($(window).width() - 20).height($(window).height() - 54).appendTo('body');
+
+            var chatheight = 0;
+
+            var chatcom = function(name, avatar, msg, timer, ziji) {
+                var image = $('<img />').attr('src', avatar).attr('title', name).width(50).height(50).css({borderRadius: '5px', verticalAlign: 'bottom'});
+                var com = $('<div />').css({background: '#EBEBEB',position: 'relative', borderRadius: '10px', padding: '5px', verticalAlign: 'bottom', display: 'inline-block', marginLeft: '10px', wordBreak: 'break-all', wordWrap: 'break-word', maxWidth: '60%'}).text(msg);
+                var title = $('<span />').css({position: 'absolute', top: '-15px', fontSize: '12px', color: '#999'}).text(name).appendTo(com);
+                if(!ziji) {
+                    title.css({left: '0'});
+                    var li = $('<li />').css({marginBottom: '10px'}).append(image).append(com).appendTo(chatroom);
+                    //alert('ziji');
+                }else{
+                    com.css({background: '#4898F8', marginLeft: '0', marginRight: '10px', textAlign: 'left'});
+                    title.css({right: '0'});
+                    var li = $('<li />').css({marginBottom: '20px', textAlign: 'right'}).append(com).append(image).appendTo(chatroom);
+                }
+
+                chatheight += li.height() + 20;
+                chatroom.animate({scrollTop: chatheight}, 300);
+            };
+
+            /**
+             *
+             * 创建聊天框
+             *
+             */
+
+            var chatbox = $('<div />').css({position: 'fixed', borderTop: '1px #333 solid', bottom: '0', left: '0', overflow: 'hidden'}).width($(window).width()).appendTo('body');
+            var chatinput = $('<input />').css({border: 'none', fontSize: '1em', outline: 'none', padding: '5px'}).width(chatbox.width() - 10).appendTo(chatbox).focus(function() {
+                chatbox.css({boxShadow: '0 0 5px #4898F8'});
+            }).blur(function() {
+                        chatbox.css({boxShadow: '0 0 5px #333'});
+                    });
+            chatinput.keypress(function(e) {
+                //alert(chatinput.val());
+                if(e.keyCode == 13) {
+
+                    if(chatinput.val() != '') {
+
+                        socket.emit('chatall', {
+                            id    : n,
+                            avatar: a,
+                            msg   : chatinput.val(),
+                            ip    : myip,
+                            timer : 0
+                        });
+                        chatcom(n, a, chatinput.val(), (new Date()).getTime(), true);
+                        chatinput.val('');
+                    }
+
+                    return false;
+                }
+            });
+
+            var systemmsg = function(msg) {
+                var com = $('<div />').css({display: 'inline-block', fontSize: '12px', color: '#CCC', margin: 'auto'}).text('[系统] ' + msg);
+
+                var li = $('<li />').css({marginBottom: '10px'}).append(com).appendTo(chatroom);
+
+                chatheight += li.height() + 10;
+                chatroom.animate({scrollTop: chatheight}, 300);
+            };
+
+            /**
+             *
+             * 系统尺寸改变
+             *
+             */
+
+            $(window).resize(function() {
+
+                    chatroom.width($(window).width() - 20).height($(window).height() - 54);
+
+                    chatroom.animate({scrollTop: chatheight}, 300);
+                    chatbox.width($(window).width());
+
+            });
 
 
-</script>
+        }
+
+
+    </script>
 </head>
 <body>
 
