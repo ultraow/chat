@@ -37,10 +37,10 @@
       <file leaf-file-name="mini.html" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mini.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="141" column="52" selection-start="5914" selection-end="5914" vertical-scroll-proportion="0.081374325" vertical-offset="2190" max-vertical-offset="3015">
+            <state line="112" column="36" selection-start="4723" selection-end="4723" vertical-scroll-proportion="0.43037975" vertical-offset="1562" max-vertical-offset="3090">
               <folding>
-                <marker date="1393577818000" expanded="true" signature="985:1011" placeholder="..." />
-                <marker date="1393577818000" expanded="true" signature="1447:1473" placeholder="..." />
+                <marker date="1393578549000" expanded="true" signature="985:1011" placeholder="..." />
+                <marker date="1393578549000" expanded="true" signature="1447:1473" placeholder="..." />
               </folding>
             </state>
           </provider>
@@ -58,7 +58,7 @@
       <file leaf-file-name="chat.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/chat.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="79" column="8" selection-start="6100" selection-end="6210" vertical-scroll-proportion="87.5" vertical-offset="3285" max-vertical-offset="4560">
+            <state line="8" column="73" selection-start="389" selection-end="389" vertical-scroll-proportion="-5.0" vertical-offset="0" max-vertical-offset="4560">
               <folding />
             </state>
           </provider>
@@ -82,9 +82,9 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/chat.html" />
         <option value="$PROJECT_DIR$/server.js" />
         <option value="$PROJECT_DIR$/index.html" />
+        <option value="$PROJECT_DIR$/chat.html" />
         <option value="$PROJECT_DIR$/mini.html" />
       </list>
     </option>
@@ -249,13 +249,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/chat.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="79" column="8" selection-start="6100" selection-end="6210" vertical-scroll-proportion="87.5" vertical-offset="3285" max-vertical-offset="4560">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="104" column="62" selection-start="3279" selection-end="3279" vertical-scroll-proportion="0.0" vertical-offset="1176" max-vertical-offset="1740">
@@ -270,12 +263,19 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/chat.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="8" column="73" selection-start="389" selection-end="389" vertical-scroll-proportion="-5.0" vertical-offset="0" max-vertical-offset="4560">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/mini.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="141" column="52" selection-start="5914" selection-end="5914" vertical-scroll-proportion="0.081374325" vertical-offset="2190" max-vertical-offset="3015">
+        <state line="112" column="36" selection-start="4723" selection-end="4723" vertical-scroll-proportion="0.43037975" vertical-offset="1562" max-vertical-offset="3090">
           <folding>
-            <marker date="1393577818000" expanded="true" signature="985:1011" placeholder="..." />
-            <marker date="1393577818000" expanded="true" signature="1447:1473" placeholder="..." />
+            <marker date="1393578549000" expanded="true" signature="985:1011" placeholder="..." />
+            <marker date="1393578549000" expanded="true" signature="1447:1473" placeholder="..." />
           </folding>
         </state>
       </provider>

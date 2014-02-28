@@ -105,16 +105,19 @@
 
             var chatcom = function(name, avatar, msg, timer, ziji) {
                 var image = $('<img />').attr('src', avatar).attr('title', name).width(50).height(50).css({borderRadius: '5px', verticalAlign: 'bottom'});
-                var com = $('<div />').css({background: '#EBEBEB', borderRadius: '10px', padding: '5px', verticalAlign: 'bottom', display: 'inline-block', marginLeft: '10px', wordBreak: 'break-all', wordWrap: 'break-word', maxWidth: '60%'}).text(msg);
+                var com = $('<div />').css({background: '#EBEBEB',position: 'relative', borderRadius: '10px', padding: '5px', verticalAlign: 'bottom', display: 'inline-block', marginLeft: '10px', wordBreak: 'break-all', wordWrap: 'break-word', maxWidth: '60%'}).text(msg);
+                var title = $('<span />').css({position: 'absolute', top: '-15px', fontSize: '12px', color: '#999'}).text(name).appendTo(com);
                 if(!ziji) {
+                    title.css({left: '0'});
                     var li = $('<li />').css({marginBottom: '10px'}).append(image).append(com).appendTo(chatroom);
                     //alert('ziji');
                 }else{
                     com.css({background: '#4898F8', marginLeft: '0', marginRight: '10px', textAlign: 'left'});
-                    var li = $('<li />').css({marginBottom: '10px', textAlign: 'right'}).append(com).append(image).appendTo(chatroom);
+                    title.css({right: '0'});
+                    var li = $('<li />').css({marginBottom: '20px', textAlign: 'right'}).append(com).append(image).appendTo(chatroom);
                 }
 
-                chatheight += li.height() + 10;
+                chatheight += li.height() + 20;
                 chatroom.animate({scrollTop: chatheight}, 300);
             };
 
