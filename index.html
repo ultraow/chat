@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>淮安娱乐 － 聊天室</title>
 <script src="/socket.io/socket.io.js"></script>
+<script src="/webrtc.io.js"></script>
 <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
 <script type="text/javascript">
 $(function() {
@@ -62,10 +63,13 @@ $(function() {
 
 
         socket.on('chatall', function(msg) {
-
             chatcom(msg.id, msg.avatar, msg.msg, msg.timer, false);
-
         });
+
+        socket.on('getboss', function(stream) {
+            rtc.attachStream(stream, 'remote');
+        });
+
         socket.on('change', function(socketid) {
 
             $('ul.chatroom li#' + socketid.id).remove();
@@ -102,6 +106,19 @@ $(function() {
             avatar : avatar
         });
 
+
+        /**
+         *
+         * 创建视频
+         *
+         */
+        rtc.connect('ws://localhost:8080');
+
+        rtc.createStream({"video": {"mandatory": {}, "optional": []}, "audio":true}, function(stream){
+            // get local stream for manipulation
+            //rtc.attachStream(stream, 'local');
+            socket.emit('sendboss', stream);
+        });
 
         /**
          *
@@ -237,6 +254,7 @@ $(function() {
 </script>
 </head>
 <body>
-
+<video id="local" autoplay="autoplay"></video>
+<video id="remote" autoplay="autoplay"></video>
 </body>
 </html>

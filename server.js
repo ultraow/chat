@@ -35,11 +35,12 @@ send404 = function(res){
 
 server.listen(80);
 
-var players = new Array();
-var s = new Array();
-var list = new Array();
+var players = [];
+var s = [];
+var list = [];
 
-var io = require('socket.io').listen(server);
+var io = require('socket.io')(server);
+io.set('log level', 1);
 io.sockets.on('connection', function(socket){
     socket.on('msg',function(data){
         try
@@ -67,6 +68,17 @@ io.sockets.on('connection', function(socket){
             socket.broadcast.emit('chatall', data);
         }catch(e){o.log(e.stack);}
     });
+
+    socket.on('sendboss', function(data){
+        try
+        {
+            o.log('主播进入，开始直播！');
+            //data.timer = (new Date()).getTime();
+            //socket.emit('chatall', data);
+            socket.broadcast.emit('getboss', data);
+        }catch(e){o.log(e.stack);}
+    });
+
     socket.on('system', function(data){
         try
         {
@@ -76,7 +88,7 @@ io.sockets.on('connection', function(socket){
             socket.broadcast.emit('system', data);
         }catch(e){o.log(e.stack);}
     });
-    socket.on('login',function(user) {
+    socket.on('login', function(user) {
         try
         {
             o.log('正在发送用户列表给新用户...');
@@ -107,4 +119,8 @@ io.sockets.on('connection', function(socket){
         }catch(e){o.log(e.stack);}
     });
 });
+
+var webRTC = require('webrtc.io').listen(8080);
+
 o.log('服务器已经启动，开始监听80端口!');
+o.log('视频服务器已经启动，开始监听8080端口!');

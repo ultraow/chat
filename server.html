@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<video id="local" autoplay="autoplay"></video>
+
+<script src="/webrtc.io.js"></script>
+<script>
+
+    // note: make sure hostname available to all connecting clients
+    // (ie. probably not `localhost`)
+    rtc.connect('ws://localhost:8080');
+
+    rtc.createStream({"video": {"mandatory": {}, "optional": []}, "audio":true}, function(stream){
+        // get local stream for manipulation
+        rtc.attachStream(stream, 'local');
+    });
+
+    // more rtc callbacks are available
+</script>
+</body>
+</html>
