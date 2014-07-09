@@ -124,7 +124,7 @@ io.sockets.on('connection', function(socket){
     });
 });
 
-//var webRTC = require('webrtc.io').listen(8080);
+var webRTC = require('webrtc.io').listen(8080);
 
 o.log('服务器已经启动，开始监听80端口!');
 o.log('视频服务器已经启动，开始监听8080端口!');

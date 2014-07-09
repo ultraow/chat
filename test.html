@@ -10,7 +10,7 @@
 <link href="http://w.ireoo.com/css/style.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
 <script src="http://localhost/socket.io/socket.io.js"></script>
-<script src="http://localhost:3000/SkyRTC-client.js"></script>
+<script src="http://localhost/webrtc.io.js"></script>
 <script type="text/javascript">
 $(function() {
     var name = 'ireoo' + Math.floor(Math.random()*1000000+1);
@@ -194,57 +194,28 @@ $(function() {
      * 创建视频
      *
      */
-});
+    rtc.connect('ws://localhost:8080');
 
-
-var rtc = SkyRTC();
-
-//成功创建WebSocket连接
-rtc.on("connected", function(socket) {
-    //创建本地视频流
-    rtc.createStream({
-        "video": true,
-        "audio": true
+    rtc.createStream({"video":
+    {
+        mandatory: { 'minAspectRatio': 2, 'maxAspectRatio': 2 },
+        optional: []
+    },
+        "audio":true
+    }, function(stream){
+        // get local stream for manipulation
+        rtc.attachStream(stream, 'me');
     });
-});
 
-//创建本地视频流成功
-rtc.on("stream_created", function(stream) {
-    document.getElementById('me').src = URL.createObjectURL(stream);
-    document.getElementById('me').play();
-});
+    rtc.on('add remote stream', function(stream){
+        // show the remote video
+        rtc.attachStream(stream, 'boss');
+    });
 
-//创建本地视频流失败
-rtc.on("stream_create_error", function() {
-    alert("create stream failed!");
-});
-
-//接收到其他用户的视频流
-rtc.on('pc_add_stream', function(stream, socketId) {
-//    var newVideo = document.createElement("video"),
-//            id = "other-" + socketId;
-//    newVideo.setAttribute("class", "other");
-//    newVideo.setAttribute("autoplay", "autoplay");
-//    newVideo.setAttribute("id", id);
-//    videos.appendChild(newVideo);
-    rtc.attachStream(stream, 'boss');
-});
-
-//删除其他用户
-rtc.on('remove_peer', function(socketId) {
-    var video = document.getElementById('other-' + socketId);
-    if(video){
-        video.parentNode.removeChild(video);
-    }
-});
-
-//获取主播
-rtc.on('get_boss', function() {
 
 });
 
-//连接WebSocket服务器
-rtc.connect("ws:localhost:3000", window.location.hash.slice(1));
+
 
 
 
@@ -253,12 +224,14 @@ rtc.connect("ws:localhost:3000", window.location.hash.slice(1));
 
     .clear{clear: both; font-size: 0; height: 0; display: block;}
 
-    div.m{width: 1000px; margin: auto; background: #EBEBEB;}
-    ol{float: left; width: 290px;}
-    div.right{float: right; width: 700px; background: #FFF;}
+    div.m{width: 1000px; margin: auto;}
+    ol{float: left; width: 190px; background: #EBEBEB;}
+    div.right{float: right; width: 800px; background: #FFF;}
 
 
-    div.video video{width: 100%;}
+    div.video video#boss{width: 100%; background: #000;}
+    /* div.video{position: relative;} */
+    div.video video#me{position: absolute; right: 10px; bottom: 10px; width: 200px;}
 
     div.input{padding: 5px; border: 1px #CCC solid;}
     input#say{width: 100%; border: none; outline: none;}
@@ -277,15 +250,6 @@ rtc.connect("ws:localhost:3000", window.location.hash.slice(1));
 </div>
 <div class="m">
     <ol>
-        <h1>联系方式</h1>
-        <li>联系电话：18652327596</li>
-        <li>联系QQ：19980108</li>
-        <li>微信号：venxun</li>
-        <li>MSN：ultra@own.cm</li>
-        <li>SKYPE：</li>
-        <li>邮箱：i@ireoo.com</li>
-        <li>公司：淮安万达信息科技有限公司</li>
-        <li>详细地址：江苏省淮安市清河区曙光南路2号</li>
 
         <h1>资料</h1>
         <li>年龄：26</li>
@@ -305,8 +269,8 @@ rtc.connect("ws:localhost:3000", window.location.hash.slice(1));
 
     <div class="right">
         <div class="video">
-            <video id="boss" autoplay muted></video>
-            <video id="me" autoplay muted></video>
+            <video id="boss" autoplay></video>
+            <video id="me" style="display: none;" autoplay muted></video>
         </div>
         <div class="input">
             <input id="say" />
