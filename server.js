@@ -111,6 +111,8 @@ io.sockets.on('connection', function(socket){
     socket.on('disconnect', function(){
         try
         {
+            o.log('用户 ' + players[socket.id].name + ' 退出了! 当前在线人数：' + String(list.length - 1));
+            socket.broadcast.emit('change', players[socket.id]);
             players.splice(socket.id, 1);
             s.splice(socket.id, 1);
             for(var i=0; i < list.length; i++) {
@@ -118,8 +120,8 @@ io.sockets.on('connection', function(socket){
                     list.splice(i, 1);
                 }
             }
-            socket.broadcast.emit('change', players[socket.id]);
-            o.log('用户 ' + players[socket.id] + ' 退出了! 当前在线人数：' + String(list.length));
+
+
         }catch(e){o.log(e.stack);}
     });
 });
