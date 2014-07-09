@@ -1,12 +1,10 @@
-//CLIENT
 
-// Fallbacks for vendor-specific variables until the spec is finalized.
 
 var PeerConnection = (window.PeerConnection || window.webkitPeerConnection00 || window.webkitRTCPeerConnection || window.mozRTCPeerConnection);
 var URL = (window.URL || window.webkitURL || window.msURL || window.oURL);
 var getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
 var nativeRTCIceCandidate = (window.mozRTCIceCandidate || window.RTCIceCandidate);
-var nativeRTCSessionDescription = (window.mozRTCSessionDescription || window.RTCSessionDescription); // order is very important: "RTCSessionDescription" defined in Nighly but useless
+var nativeRTCSessionDescription = (window.mozRTCSessionDescription || window.RTCSessionDescription);
 
 var sdpConstraints = {
   'mandatory': {
@@ -25,7 +23,6 @@ if (navigator.webkitGetUserMedia) {
     };
   }
 
-  // New syntax of getXXXStreams method in M26.
   if (!webkitRTCPeerConnection.prototype.getLocalStreams) {
     webkitRTCPeerConnection.prototype.getLocalStreams = function() {
       return this.localStreams;
@@ -45,14 +42,10 @@ if (navigator.webkitGetUserMedia) {
     rtc = module.exports = {};
   }
 
-
-  // Holds a connection to the server.
   rtc._socket = null;
 
-  // Holds identity for the client
   rtc._me = null;
 
-  // Holds callbacks for certain events.
   rtc._events = {};
 
   rtc.on = function(eventName, callback) {
@@ -73,7 +66,6 @@ if (navigator.webkitGetUserMedia) {
     }
   };
 
-  // Holds the STUN/ICE server to use for PeerConnections.
   rtc.SERVER = function() {
     if (navigator.mozGetUserMedia) {
       return {
@@ -90,21 +82,16 @@ if (navigator.webkitGetUserMedia) {
   };
 
 
-  // Reference to the lone PeerConnection instance.
   rtc.peerConnections = {};
 
-  // Array of known peer socket ids
   rtc.connections = [];
-  // Stream-related variables.
   rtc.streams = [];
   rtc.numStreams = 0;
   rtc.initializedStreams = 0;
 
 
-  // Reference to the data channels
   rtc.dataChannels = {};
 
-  // PeerConnection datachannel configuration
   rtc.dataChannelConfig = {
     "optional": [{
       "RtpDataChannels": true
@@ -120,10 +107,8 @@ if (navigator.webkitGetUserMedia) {
   };
 
 
-  // check whether data channel is supported.
   rtc.checkDataChannelSupport = function() {
     try {
-      // raises exception if createDataChannel is not supported
       var pc = new PeerConnection(rtc.SERVER(), rtc.dataChannelConfig);
       var channel = pc.createDataChannel('supportCheck', {
         reliable: false
@@ -138,11 +123,8 @@ if (navigator.webkitGetUserMedia) {
   rtc.dataChannelSupport = rtc.checkDataChannelSupport();
 
 
-  /**
-   * Connects to the websocket server.
-   */
   rtc.connect = function(server, room) {
-    room = room || ""; // by default, join a room called the blank string
+    room = room || "";
     rtc._socket = new WebSocket(server);
 
     rtc._socket.onopen = function() {
@@ -172,7 +154,6 @@ if (navigator.webkitGetUserMedia) {
       rtc.on('get_peers', function(data) {
         rtc.connections = data.connections;
         rtc._me = data.you;
-        // fire connections event and pass peers
         rtc.fire('connections', rtc.connections);
       });
 
@@ -252,12 +233,10 @@ if (navigator.webkitGetUserMedia) {
     };
 
     pc.onopen = function() {
-      // TODO: Finalize this API
       rtc.fire('peer connection opened');
     };
 
     pc.onaddstream = function(event) {
-      // TODO: Finalize this API
       rtc.fire('add remote stream', event.stream, id);
     };
 
@@ -280,7 +259,6 @@ if (navigator.webkitGetUserMedia) {
         "MozDontOfferDataChannel": true
       }
     };
-    // temporary measure to remove Moz* constraints in Chrome
     if (navigator.webkitGetUserMedia) {
       for (var prop in constraints.mandatory) {
         if (prop.indexOf("Moz") != -1) {
@@ -320,7 +298,6 @@ if (navigator.webkitGetUserMedia) {
           "sdp": session_description
         }
       }));
-      //TODO Unused variable!?
       var offer = pc.remoteDescription;
     }, null, sdpConstraints);
   };
@@ -384,7 +361,6 @@ if (navigator.webkitGetUserMedia) {
 
   rtc.createDataChannel = function(pcOrId, label) {
     if (!rtc.dataChannelSupport) {
-      //TODO this should be an exception
       alert('webRTC data channel is not yet supported in this browser,' +
         ' or you must turn on experimental flags');
       return;
@@ -406,10 +382,8 @@ if (navigator.webkitGetUserMedia) {
 
     if (!pc || !(pc instanceof PeerConnection)) throw new Error('attempt to createDataChannel without peerConnection');
 
-    // need a label
     label = label || 'fileTransfer' || String(id);
 
-    // chrome only supports reliable false atm.
     var options = {
       reliable: false
     };
@@ -450,7 +424,6 @@ if (navigator.webkitGetUserMedia) {
       rtc.fire('data stream error', channel, err);
     };
 
-    // track dataChannel
     rtc.dataChannels[id] = channel;
     return channel;
   };
@@ -475,7 +448,6 @@ if (navigator.webkitGetUserMedia) {
 function preferOpus(sdp) {
   var sdpLines = sdp.split('\r\n');
   var mLineIndex = null;
-  // Search for m line.
   for (var i = 0; i < sdpLines.length; i++) {
     if (sdpLines[i].search('m=audio') !== -1) {
       mLineIndex = i;
@@ -484,7 +456,6 @@ function preferOpus(sdp) {
   }
   if (mLineIndex === null) return sdp;
 
-  // If Opus is available, set it as the default in m line.
   for (var j = 0; j < sdpLines.length; j++) {
     if (sdpLines[j].search('opus/48000') !== -1) {
       var opusPayload = extractSdp(sdpLines[j], /:(\d+) opus\/48000/i);
@@ -493,7 +464,6 @@ function preferOpus(sdp) {
     }
   }
 
-  // Remove CN in m line and sdp.
   sdpLines = removeCN(sdpLines, mLineIndex);
 
   sdp = sdpLines.join('\r\n');
@@ -510,8 +480,8 @@ function setDefaultCodec(mLine, payload) {
   var newLine = [];
   var index = 0;
   for (var i = 0; i < elements.length; i++) {
-    if (index === 3) // Format of media starts from the fourth.
-    newLine[index++] = payload; // Put target payload to the first.
+    if (index === 3)
+    newLine[index++] = payload;
     if (elements[i] !== payload) newLine[index++] = elements[i];
   }
   return newLine.join(' ');
@@ -519,16 +489,13 @@ function setDefaultCodec(mLine, payload) {
 
 function removeCN(sdpLines, mLineIndex) {
   var mLineElements = sdpLines[mLineIndex].split(' ');
-  // Scan from end for the convenience of removing an item.
   for (var i = sdpLines.length - 1; i >= 0; i--) {
     var payload = extractSdp(sdpLines[i], /a=rtpmap:(\d+) CN\/\d+/i);
     if (payload) {
       var cnPos = mLineElements.indexOf(payload);
       if (cnPos !== -1) {
-        // Remove CN payload from m line.
         mLineElements.splice(cnPos, 1);
       }
-      // Remove CN line in sdp
       sdpLines.splice(i, 1);
     }
   }

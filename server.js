@@ -15,7 +15,7 @@ var http = require('http'),
 server = http.createServer(function(req, res){
     req.setEncoding(encoding="utf8");
     var path = url.parse(req.url).pathname;
-    o.log(path);   //显示用户打开扫描页面
+    o.log(path);
 
     if(path == '/') path = '/index.html';
 
@@ -65,7 +65,7 @@ io.sockets.on('connection', function(socket){
         {
             o.log(players[socket.id].name + ' say: ' + data.msg);
             data.timer = (new Date()).getTime();
-            //socket.emit('chatall', data);
+
             socket.broadcast.emit('chatall', data);
         }catch(e){o.log(e.stack);}
     });
@@ -74,9 +74,7 @@ io.sockets.on('connection', function(socket){
         try
         {
             o.log('主播进入，开始直播！');
-            //data.timer = (new Date()).getTime();
-            //socket.emit('chatall', data);
-            //videos.push(data);
+
             socket.broadcast.emit('getboss', data);
 
             o.log(data);
@@ -88,7 +86,7 @@ io.sockets.on('connection', function(socket){
         {
             o.log('[system]: ' + data.msg);
             data.timer = (new Date()).getTime();
-            //socket.emit('chatall', data);
+
             socket.broadcast.emit('system', data);
         }catch(e){o.log(e.stack);}
     });
@@ -103,7 +101,7 @@ io.sockets.on('connection', function(socket){
             socket.emit('login', socket.id);
             user.id = socket.id;
             list.push(user);
-            //socket.emit('loginIn', user);
+
             socket.broadcast.emit('loginIn', user);
             o.log('用户 ' + user.name + ' 登录了！当前在线人数：' + String(list.length));
         }catch(e){o.log(e.stack);}
@@ -111,7 +109,7 @@ io.sockets.on('connection', function(socket){
     socket.on('disconnect', function(){
         try
         {
-            o.log('用户 ' + players[socket.id].name + ' 退出了! 当前在线人数：' + String(list.length - 1));
+            o.log('用户退出了! 当前在线人数：' + String(list.length - 1));
             socket.broadcast.emit('change', players[socket.id]);
             players.splice(socket.id, 1);
             s.splice(socket.id, 1);
