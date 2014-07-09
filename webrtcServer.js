@@ -1,36 +1,54 @@
-/**
- * Created by Ultra on 2014/7/9.
- */
-var http = require('http'),
-    url = require('url'),
-    fs = require('fs'),
-    o  = require('util'),
-    server;
+var express = require('express');
+var app = express();
+var server = require('http').createServer(app);
+var SkyRTC = require('skyrtc').listen(server);
+var path = require("path");
 
-server = http.createServer(function(req, res){
-    req.setEncoding(encoding="utf8");
-    var path = url.parse(req.url).pathname;
-    o.log(path);   //显示用户打开扫描页面
+var port = process.env.PORT || 3000;
+server.listen(port);
 
-    if(path == '/') path = '/index.html';
+app.use(express.static(path.join(__dirname, 'public')));
 
-    fs.readFile(__dirname + path, function(err, data){
-        if (err) return send404(res);
-        res.writeHead(200, {'Content-Type': path.substr(path.length - 2) == 'js' ? 'text/javascript, charset=UTF-8' : 'text/html, charset=UTF-8'});
-        res.write(data, 'utf8');
-        res.end();
-    });
+app.get('/', function(req, res) {
+    res.sendfile(__dirname + '/index.html');
 });
 
-send404 = function(res){
-    res.writeHead(404);
-    res.write('404 Not Found');
-    res.end();
-};
+app.get('/test', function(req, res) {
+    res.sendfile(__dirname + '/test.html');
+});
 
-server.listen(8080);
+SkyRTC.rtc.on('new_connect', function(socket) {
+    console.log('创建新连接');
+});
 
-var webRTC = require('webrtc.io').listen(server),
-    o  = require('util');
+SkyRTC.rtc.on('remove_peer', function(socketId) {
+    console.log(socketId + "用户离开");
+});
 
-o.log('视频服务器已经启动，开始监听80端口!');
+SkyRTC.rtc.on('new_peer', function(socket, room) {
+    console.log("新用户" + socket.id + "加入房间" + room);
+});
+
+SkyRTC.rtc.on('socket_message', function(socket, msg) {
+    console.log("接收到来自" + socket.id + "的新消息：" + msg);
+});
+
+SkyRTC.rtc.on('ice_candidate', function(socket, ice_candidate) {
+    console.log("接收到来自" + socket.id + "的ICE Candidate");
+});
+
+SkyRTC.rtc.on('offer', function(socket, offer) {
+    console.log("接收到来自" + socket.id + "的Offer");
+});
+
+SkyRTC.rtc.on('answer', function(socket, answer) {
+    console.log("接收到来自" + socket.id + "的Answer");
+});
+
+SkyRTC.rtc.on('get_boss', function(socket, answer) {
+    console.log("接收到来自" + socket.id + "的Answer");
+});
+
+SkyRTC.rtc.on('error', function(error) {
+    console.log("发生错误：" + error.message);
+});

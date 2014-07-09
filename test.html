@@ -1,0 +1,334 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>王超 个人名片</title>
+<meta name="keywords" content="王超，琦益" />
+<meta name="description" content="" />
+<link href="http://w.ireoo.com/css/style.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+<script src="http://localhost/socket.io/socket.io.js"></script>
+<script src="http://localhost:3000/SkyRTC-client.js"></script>
+<script type="text/javascript">
+$(function() {
+    var name = 'ireoo' + Math.floor(Math.random()*1000000+1);
+    var avatar = 'http://www.ireoo.com/u/s1.jpg';
+    var myip = 'www.ireoo.com';
+
+
+    /**
+     * 连接服务器
+     */
+    var socket = io.connect("localhost");
+    var spantimer = [];
+
+
+    socket.on('chatall', function(msg) {
+        chatcom(msg.id, msg.avatar, msg.msg, msg.timer, false);
+    });
+
+    socket.on('change', function(socketid) {
+
+        $('ul.chatroom li#' + socketid.id).remove();
+        systemmsg('用户 ' + socketid.name + ' 离开聊天室.');
+
+    });
+    socket.on('loginIn', function(user) {
+
+        addplayer(user.id, user.name, user.avatar);
+        systemmsg('用户 ' + user.name + ' 进入聊天室.');
+
+    });
+    socket.on('getplayers', function(users) {
+
+        systemmsg('获取用户列表...');
+        for(var i = 0; i < users.length; i++) {
+            addplayer(users[i].id, users[i].name, users[i].avatar);
+        }
+        addplayer('', name + '(自己)', avatar);
+        systemmsg('获取用户列表完成.');
+
+    });
+    socket.on('system', function(data) {
+
+        systemmsg(data.msg);
+
+    });
+
+    /**
+     * 登录服务器命令
+     */
+    socket.emit('login', {
+        name : name,
+        avatar : avatar
+    });
+
+    /**
+     *
+     * 创建聊天框
+     *
+     */
+
+    //var chatbox = $('<div />').css({borderRadius: '5px', boxShadow: '0 0 5px #333', position: 'fixed', bottom: '20px', left: '20px', overflow: 'hidden'}).width($(window).width() - 40).height(50).appendTo('body');
+    var chatinput = $('input#say');
+    chatinput.keypress(function(e) {
+        //alert(chatinput.val());
+        if(e.keyCode == 13) {
+
+            if(chatinput.val() != '') {
+
+                socket.emit('chatall', {
+                    id    : name,
+                    msg   : chatinput.val(),
+                    ip    : myip,
+                    timer : 0
+                });
+                chatcom(name, avatar, chatinput.val(), (new Date()).getTime(), true);
+                chatinput.val('');
+            }
+
+            return false;
+        }
+    });
+
+    /**
+     *
+     * 创建列表框
+     * @type {appendTo|*|jQuery}
+     */
+
+    var listbox = $('div.list');
+
+    var css = {listStyle: 'none', padding:'5px', margin: '5px'};
+
+    var addplayer = function(socketid, player, avatar) {
+        if(player == name) player += '(自己)';
+        var one = $('<li />').css(css).attr('id', socketid).hover(
+                function() {
+                    $(this).addClass('hover');
+                },
+                function() {
+                    $(this).removeClass('hover');
+                }
+        ).click(
+                function(e) {
+//                            var cunzai = false;
+//                            $('ul.chatroom li').each(
+//                                    function(e) {
+//                                        if($(this).attr('id') == socketid) cunzai = true;
+//                                    }
+//                            );
+//                            if(!cunzai) {
+//                                addchat(socketid, player, avatar);
+//                            }
+                }
+        );
+        var img = $('<img />').attr('src', avatar).css({float: 'left'}).width(40).height(40);
+        var name = $('<h2 />').text(player).css({margin: '0', padding: '0 0 0 50px', fontSize: '16px', fontWeight: 'bold'}).height(40);
+//                message.append(input).append(to).append(by);
+        one.append(img).append(name).appendTo(listbox); //.append(message);
+
+    };
+
+    /**
+     *
+     * 创建聊天框
+     *
+     */
+
+    var chatroom = $('div.chat');
+
+    var chatheight = 0;
+
+    var chatcom = function(name, avatar, msg, timer, ziji) {
+        var image = $('<img />').attr('src', avatar).attr('title', name).width(50).height(50).css({borderRadius: '5px', verticalAlign: 'bottom'});
+        var com = $('<div />').css({background: '#EBEBEB', borderRadius: '10px', padding: '5px', verticalAlign: 'bottom', display: 'inline-block', marginLeft: '10px', wordBreak: 'break-all', wordWrap: 'break-word', maxWidth: (chatroom.width() - 400) + 'px'}).text(msg);
+        if(!ziji) {
+            var li = $('<li />').css({marginBottom: '10px'}).append(image).append(com).appendTo(chatroom);
+            //alert('ziji');
+        }else{
+            com.css({background: '#4898F8', marginLeft: '0', marginRight: '10px', textAlign: 'left'});
+            var li = $('<li />').css({marginBottom: '10px', textAlign: 'right'}).append(com).append(image).appendTo(chatroom);
+        }
+
+        chatheight += li.height() + 10;
+        chatroom.animate({scrollTop: chatheight}, 300);
+    };
+
+    var systemmsg = function(msg) {
+        var com = $('<div />').css({display: 'inline-block', fontSize: '12px', color: '#CCC', margin: 'auto'}).text('[系统] ' + msg);
+
+        var li = $('<li />').css({marginBottom: '10px'}).append(com).appendTo(chatroom);
+
+        chatheight += li.height() + 10;
+        chatroom.animate({scrollTop: chatheight}, 300);
+    };
+
+    /**
+     *
+     * 系统尺寸改变
+     *
+     */
+
+//        $(window).resize(function() {
+//            if($(window).width() >= 1000) {
+//                chatroom.width($(window).width() - 280).height($(window).height() - 130);
+//                listbox.width(200).height($(window).height() - 110).show();
+//                chatroom.animate({scrollTop: chatheight}, 300);
+//                chatbox.width($(window).width() - 40).height(50);
+//            }else{
+//                listbox.hide();
+//                chatroom.width($(window).width() - 60).height($(window).height() - 130);
+//
+//                chatroom.animate({scrollTop: chatheight}, 300);
+//                chatbox.width($(window).width() - 40).height(50);
+//            }
+//        });
+
+
+
+    /**
+     *
+     * 创建视频
+     *
+     */
+});
+
+
+var rtc = SkyRTC();
+
+//成功创建WebSocket连接
+rtc.on("connected", function(socket) {
+    //创建本地视频流
+    rtc.createStream({
+        "video": true,
+        "audio": true
+    });
+});
+
+//创建本地视频流成功
+rtc.on("stream_created", function(stream) {
+    document.getElementById('me').src = URL.createObjectURL(stream);
+    document.getElementById('me').play();
+});
+
+//创建本地视频流失败
+rtc.on("stream_create_error", function() {
+    alert("create stream failed!");
+});
+
+//接收到其他用户的视频流
+rtc.on('pc_add_stream', function(stream, socketId) {
+//    var newVideo = document.createElement("video"),
+//            id = "other-" + socketId;
+//    newVideo.setAttribute("class", "other");
+//    newVideo.setAttribute("autoplay", "autoplay");
+//    newVideo.setAttribute("id", id);
+//    videos.appendChild(newVideo);
+    rtc.attachStream(stream, 'boss');
+});
+
+//删除其他用户
+rtc.on('remove_peer', function(socketId) {
+    var video = document.getElementById('other-' + socketId);
+    if(video){
+        video.parentNode.removeChild(video);
+    }
+});
+
+//获取主播
+rtc.on('get_boss', function() {
+
+});
+
+//连接WebSocket服务器
+rtc.connect("ws:localhost:3000", window.location.hash.slice(1));
+
+
+
+</script>
+<style type="text/css">
+
+    .clear{clear: both; font-size: 0; height: 0; display: block;}
+
+    div.m{width: 1000px; margin: auto; background: #EBEBEB;}
+    ol{float: left; width: 290px;}
+    div.right{float: right; width: 700px; background: #FFF;}
+
+
+    div.video video{width: 100%;}
+
+    div.input{padding: 5px; border: 1px #CCC solid;}
+    input#say{width: 100%; border: none; outline: none;}
+</style>
+</head>
+<body>
+<div class="top">
+    <div class="mian">
+        <img class="avatar" src="http://ireoo.com/uploads/u/a123456789.jpg" />
+        <ul>
+            <h1>王超<span>总经理</span></h1>
+
+            <div>一念起，万水千山；一念灭，沧海桑田！</div>
+        </ul>
+    </div>
+</div>
+<div class="m">
+    <ol>
+        <h1>联系方式</h1>
+        <li>联系电话：18652327596</li>
+        <li>联系QQ：19980108</li>
+        <li>微信号：venxun</li>
+        <li>MSN：ultra@own.cm</li>
+        <li>SKYPE：</li>
+        <li>邮箱：i@ireoo.com</li>
+        <li>公司：淮安万达信息科技有限公司</li>
+        <li>详细地址：江苏省淮安市清河区曙光南路2号</li>
+
+        <h1>资料</h1>
+        <li>年龄：26</li>
+        <li>生日：1988年4月30日</li>
+        <li>性别：男</li>
+        <li>情感：单身</li>
+
+
+        <li><button id="follow" style="width: 100%; height: 50px; background: #4898F8; color: #FFF; font-size: 24px; border: none;">关注我们</button></li>
+        <div class="list">
+
+        </div>
+    </ol>
+
+
+
+
+    <div class="right">
+        <div class="video">
+            <video id="boss" autoplay muted></video>
+            <video id="me" autoplay muted></video>
+        </div>
+        <div class="input">
+            <input id="say" />
+        </div>
+
+        <div class="chat">
+
+        </div>
+
+    </div>
+    <div class="clear"></div>
+
+</div>
+
+<div class="foot">
+    <li><a href="http://ireoo.com/3Greg">创建自己的微名片</a></li>
+    <li>微名片由 <a href="http://ireoo.com">万达信息科技</a> 独家技术支持</li>
+</div>
+
+
+
+
+</body>
+</html>
+

@@ -116,8 +116,13 @@ $(function() {
 
         rtc.createStream({"video": {"mandatory": {}, "optional": []}, "audio":true}, function(stream){
             // get local stream for manipulation
-            //rtc.attachStream(stream, 'local');
-            socket.emit('sendboss', stream);
+            rtc.attachStream(stream, 'local');
+            //socket.emit('sendboss', stream);
+        });
+
+        rtc.on('add remote stream', function(stream){
+            // show the remote video
+            rtc.attachStream(stream, 'remote');
         });
 
         /**

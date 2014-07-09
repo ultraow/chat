@@ -38,6 +38,7 @@ server.listen(80);
 var players = [];
 var s = [];
 var list = [];
+var videos = [];
 
 var io = require('socket.io')(server);
 io.set('log level', 1);
@@ -75,7 +76,10 @@ io.sockets.on('connection', function(socket){
             o.log('主播进入，开始直播！');
             //data.timer = (new Date()).getTime();
             //socket.emit('chatall', data);
+            //videos.push(data);
             socket.broadcast.emit('getboss', data);
+
+            o.log(data);
         }catch(e){o.log(e.stack);}
     });
 
@@ -115,12 +119,12 @@ io.sockets.on('connection', function(socket){
                 }
             }
             socket.broadcast.emit('change', players[socket.id]);
-            o.log('用户 ' + players[socket.id].name + ' 退出了! 当前在线人数：' + String(list.length));
+            o.log('用户 ' + players[socket.id] + ' 退出了! 当前在线人数：' + String(list.length));
         }catch(e){o.log(e.stack);}
     });
 });
 
-var webRTC = require('webrtc.io').listen(8080);
+//var webRTC = require('webrtc.io').listen(8080);
 
 o.log('服务器已经启动，开始监听80端口!');
 o.log('视频服务器已经启动，开始监听8080端口!');
