@@ -9,4 +9,8 @@ RUN apt-get install nodejs -y
 RUN node -v
 RUN npm -v
 
+RUN mkdir /home/node
+COPY . /home/node
+
+RUN cd /home/node
 RUN npm install
