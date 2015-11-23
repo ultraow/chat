@@ -13,4 +13,4 @@ RUN mkdir /home/node
 COPY . /home/node
 
 RUN cd /home/node
-RUN npm install
+RUN node server.js
