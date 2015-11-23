@@ -10,7 +10,7 @@ RUN node -v
 RUN npm -v
 
 RUN mkdir /home/node
-COPY . /home/node
+COPY . /home/node/
 
-RUN cd /home/node
+RUN cd /home/node/
 RUN node server.js
